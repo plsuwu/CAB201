@@ -3,30 +3,48 @@
 namespace a2cs;
 
 /// <summary>
-/// Class for interactive input loop handling and command parsing objects
+/// Main loop for handling user input:
+/// Parses a command into an array of arguments,
+/// Calls the relevant command's handler using pattern matching, passing the array of arguments as a
+/// parameter.
 /// </summary>
-class Command {
+public class Command {
 
+    public interface ICommand {
+        string Handler(string[] args);
+    }
+
+    public class Error : ICommand {
+        public string Handler(string[] args) {
+            return $"Invalid option: {args[0]}.";
+        }
+    }
     public string? input;
 
-    // interface event loop
     public void InputLoop() {
-        Console.WriteLine(Output.Welcome);
-        Console.WriteLine(Output.Help);
-
-        // loop while handling input
-        while (true) {
-            Console.WriteLine(Output.Prompt);
+        do {
+            Console.WriteLine(Output.Info.Prompt);
             input = Console.ReadLine().Trim();
 
-            // guard
             if (input == "exit") {
-                Console.WriteLine(Output.Exit);
                 break;
             }
+            if (input == "help") {
+                Console.WriteLine(Output.Info.Help);
+                continue;
+            }
 
-            // split into lowercase array of args delimited by space char
             string[] args = input.ToLower().Split(" ");
-        }
+            // Console.WriteLine("in: [{0}]", string.Join(", ", args));
+
+            ICommand cmd = args[0] switch {
+                "add" => new Add(),
+                "map" => new Map(),
+                _ => new Error(),
+            };
+
+            Console.WriteLine(cmd.Handler(args));
+
+        } while (true);
     }
 }

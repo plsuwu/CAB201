@@ -1,5 +1,5 @@
 [package]
-name = "A2Rust"
+name = "a2rust"
 version = "0.1.0"
 edition = "2021"
 

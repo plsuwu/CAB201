@@ -1,12 +1,15 @@
 namespace a2cs;
 
-/// <summary>
-///
 public class Output {
-    public const string Welcome = "Welcome to the Threat-o-tron 9000 Obstacle Avoidance System.\n";
-    public const string Prompt = "Enter command:";
-    public const string Exit = "Thank you for using the Threat-o-tron 9000.";
-    public const string Help = @"Valid commands are:
+    public class Info {
+        public const string Welcome =
+            "Welcome to the Threat-o-tron 9000 Obstacle Avoidance System.";
+        public const string Prompt = "Enter command:";
+        public const string Exit =
+            "Thank you for using the Threat-o-tron 9000.";
+        public const string Help =
+            @"
+Valid commands are:
 add guard <x> <y>: registers a guard obstacle
 add fence <x> <y> <orientation> <length>: registers a fence obstacle. Orientation must be 'east' or 'north'.
 add sensor <x> <y> <radius>: registers a sensor obstacle
@@ -17,5 +20,5 @@ path <agent x> <agent y> <objective x> <objective y>: finds a path free of obsta
 help: displays this help message
 exit: closes this program
 ";
-
+    }
 }
