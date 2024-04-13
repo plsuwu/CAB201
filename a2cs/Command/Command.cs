@@ -19,6 +19,7 @@ public class Command {
             return $"Invalid option: {args[0]}.";
         }
     }
+
     public string? input;
 
     public void InputLoop() {

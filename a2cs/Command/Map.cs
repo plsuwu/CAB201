@@ -1,6 +1,7 @@
 namespace a2cs;
 
 class Map : Command.ICommand {
+
     public class Coordinates {
         public int X;
         public int Y;
