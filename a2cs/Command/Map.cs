@@ -13,6 +13,8 @@ class Map : Command.ICommand {
         }
 
         var coordinates = typeof(Coordinates).GetFields();
+
+        /* should be southwest cell + width and height of rendered map and NOT agent/goal coords */
         Coordinates agent = new Coordinates();
         Coordinates goal = new Coordinates();
 
@@ -38,8 +40,8 @@ class Map : Command.ICommand {
         }
 
         Render render = new Render();
-        string[] mapRender = render.Map(agent, goal);
+        string[] map = render.Map(agent, goal);
 
-        return string.Join("\n", mapRender);
+        return string.Join("\n", map);
     }
 }
