@@ -27,26 +27,24 @@ public class Active {
     }
 
     public static void Sensor(int x, int y, double range) {
-
-        // avoid big `Math.Sqrt` operations for this, especially on floating point numbers
-        double squareRange = range * range;
-
+        double squaredRange = range * range;
         int left = (int)Math.Floor(x - range);
         int right = (int)Math.Ceiling(x + range);
 
-        List<(int, int)> cells = new List<(int, int)>();
+        for (int xIter = left; xIter <= right; ++xIter) {
+            double deltaXSquare =
+                (xIter - x) * (xIter - x);  // precalculated squared horizontal
 
-        for (int i = left; i <= right; ++i) {
-            double squareX = Math.Pow(i - x, 2); // dont attempt sqrt'ing a negative int
-            if (squareX <= squareRange) {
-                double yComp = Math.Sqrt(squareRange - squareX);
-                int bottom = (int)Math.Floor(y - yComp);
-                int top = (int)Math.Ceiling(y + yComp);
+            if (deltaXSquare <= squaredRange) {
+                double yMax = Math.Sqrt(squaredRange - deltaXSquare);
+                int bottom = (int)Math.Floor(y - yMax);
+                int top = (int)Math.Ceiling(y + yMax);
 
-                for (int j = bottom; j <= top; ++j) {
-                    double distance = squareX + Math.Pow(j - y, 2);
-                    if (distance <= squareRange) {
-                        fixedObstacles.Add(((i, j), 'S'));
+                for (int yIter = bottom; yIter <= top; ++yIter) {
+                    double totalDistanceSquared =
+                        deltaXSquare + (yIter - y) * (yIter - y);
+                    if (totalDistanceSquared <= squaredRange) {
+                        fixedObstacles.Add(((xIter, yIter), 'S'));
                     }
                 }
             }

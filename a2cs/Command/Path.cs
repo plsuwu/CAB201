@@ -2,8 +2,6 @@ namespace a2cs;
 
 public class Path : Command.ICommand {
 
-    static int[][] Dirs = [[-1, 0], [1, 0], [0, 1], [0, -1]];
-
     public string Handler(string[] args) {
         if (args.Length != 5) {
             return "Incorrect number of arguments.";
@@ -41,12 +39,10 @@ public class Path : Command.ICommand {
         Render renderer = new Render();
         string[] render = renderer.Map(agent, goal);
 
+        return "any";
 
-
-
-
-
-        return "dbg msg returning from path";
+        // rudimentary implementation, might want to expand scope of walker if a valid path
+        // exists but can't be found.
     }
 }
 

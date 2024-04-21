@@ -40,6 +40,7 @@ public class Command {
 
             ICommand cmd = args[0] switch {
                 "add" => new Add(),
+                "check" => new Check(),
                 "map" => new Map(),
                 "path" => new Path(),
                 _ => new Error(),

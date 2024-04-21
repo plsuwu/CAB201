@@ -14,9 +14,8 @@ class Map : Command.ICommand {
 
         var coordinates = typeof(Coordinates).GetFields();
 
-        /* should be southwest cell + width and height of rendered map and NOT agent/goal coords */
-        Coordinates agent = new Coordinates();
-        Coordinates goal = new Coordinates();
+        Coordinates southwest = new Coordinates();
+        Coordinates size = new Coordinates();
 
         string[] rawCoordinates = args.Skip(1).ToArray();
         int[] parsedCoordinates = new int[4];
@@ -35,12 +34,12 @@ class Map : Command.ICommand {
         }
 
         for (int i = 0; i < args.Length / 2; ++i) {
-            coordinates[i].SetValue(agent, int.Parse(rawCoordinates[i]));
-            coordinates[i].SetValue(goal, int.Parse(rawCoordinates[(i + 2)]));
+            coordinates[i].SetValue(southwest, int.Parse(rawCoordinates[i]));
+            coordinates[i].SetValue(size, int.Parse(rawCoordinates[(i + 2)]));
         }
 
         Render render = new Render();
-        string[] map = render.Map(agent, goal);
+        string[] map = render.Map(southwest, size);
 
         return string.Join("\n", map);
     }
