@@ -18,10 +18,9 @@ public class Check : Command.ICommand {
             return "Coordinates are not valid integers.";
         }
 
-        List<((int, int), char, string?)> fixedObstacles = Active.fixedObstacles;
-        if (fixedObstacles.Any(obstacle => obstacle.Item2 == 'C')) {
+        if (Active.fixedObstacles.Any(obstacle => obstacle.Item2 == 'C')) {
             var cameras =
-                fixedObstacles.FindAll(obstacle => obstacle.Item2 == 'C');
+                Active.fixedObstacles.FindAll(obstacle => obstacle.Item2 == 'C');
 
             /**                 refactor me!!               */
             // needs to be pulled out into a separate fn
@@ -30,30 +29,15 @@ public class Check : Command.ICommand {
 
             Map.Coordinates start = new Map.Coordinates();
             Map.Coordinates size = new Map.Coordinates();
-            Render render = new Render();
+            // Render render = new Render();
 
-            string[] rawCoordinates = args.Skip(1).ToArray();
-            int[] parsedCoordinates = new int[2];
+            int[] parsedCoordinates = new int[4];
 
-            // bunch of garbage that isn't super necessary here.
-            try {
-                for (int i = 0; i < rawCoordinates.Length; ++i) {
-                    parsedCoordinates[i] = int.Parse(rawCoordinates[i]);
-                    if (parsedCoordinates.Any(num => num < 0)) {
-                        return "Width and height must be valid positive integers.";
-                    }
-                }
-            } catch (Exception e) {
-                if (e is FormatException || e is ArgumentException) {
-                    return "Coordinates are not valid integers.";
-                }
-            }
-
-            coordinates[0].SetValue(start, int.Parse(rawCoordinates[0]));
-            coordinates[1].SetValue(start, int.Parse(rawCoordinates[1]));
-            coordinates[0].SetValue(size, 1);
-            coordinates[1].SetValue(size, 1);
-
+            // check camera in a 3x3 square centered around cell at (x,y)
+            coordinates[0].SetValue(start, x - 1); // offset by -1
+            coordinates[1].SetValue(start, y - 1);
+            coordinates[0].SetValue(size, 3); // offset by + 1
+            coordinates[1].SetValue(size, 3);
 
             /**
              *                  refactor ahbopve!!!!!!!
@@ -62,12 +46,14 @@ public class Check : Command.ICommand {
             // this (from 'render' (?)) also could probably use its own fn call
             foreach (var camera in cameras) {
                 if (camera.Item3 is not null) {
-                    render.CameraBlocking(start, size, camera.Item3,
+                    Render.CameraBlocking(start, size, camera.Item3,
                                           camera.Item1.Item1,
                                           camera.Item1.Item2);
                 }
             }
         }
+
+        List<((int, int), char, string?)> fixedObstacles = Active.fixedObstacles;
         if (fixedObstacles.Any(obstacle => obstacle.Item1.Item1 == x &&
                                            obstacle.Item1.Item2 == y)) {
             return "Agent, your location is compromised. Abort mission.";
@@ -79,13 +65,18 @@ public class Check : Command.ICommand {
             int xAdjacent = x + dir.Value[0];
             int yAdjacent = y + dir.Value[1];
 
-            // Console.WriteLine($"{xAdjacent}, {yAdjacent}");
-
             if (!fixedObstacles.Any(obstacle =>
                                         obstacle.Item1.Item1 == xAdjacent &&
                                         obstacle.Item1.Item2 == yAdjacent)) {
+                foreach (var val in fixedObstacles) {
+                    Console.WriteLine("({0}, {1}), {2}, {3}", val.Item1.Item1, val.Item1.Item2, val.Item2, val.Item3);
+                }
                 safe.Add(dir.Key);
             }
+        }
+
+        foreach (var s in safe) {
+            Console.WriteLine("{0}", s);
         }
 
         if (safe.Count < 1) {

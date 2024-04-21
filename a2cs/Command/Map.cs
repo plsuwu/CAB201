@@ -23,9 +23,6 @@ class Map : Command.ICommand {
         try {
             for (int i = 0; i < rawCoordinates.Length; ++i) {
                 parsedCoordinates[i] = int.Parse(rawCoordinates[i]);
-                if (parsedCoordinates.Any(num => num < 0)) {
-                    return "Width and height must be valid positive integers.";
-                }
             }
         } catch (Exception e) {
             if (e is FormatException || e is ArgumentException) {

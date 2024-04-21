@@ -1,7 +1,7 @@
 namespace a2cs;
 
 class Render {
-    public void CameraBlocking(Map.Coordinates start, Map.Coordinates size,
+    public static void CameraBlocking(Map.Coordinates start, Map.Coordinates size,
                                string direction, int x, int y) {
         // Console.WriteLine($"camera obstacle facing {direction} at {x}, {y}??");
 
