@@ -19,8 +19,10 @@ public class Add : Command.ICommand {
 
     public Add() {
         actions = new Dictionary<string, Func<string[], string>>() {
-            { "guard", Guard }, { "fence", Fence }, { "sensor", Sensor },
-            // {"camera", Camera},
+            { "guard", Guard },
+            { "fence", Fence },
+            { "sensor", Sensor },
+            { "camera", Camera },
         };
     }
 
@@ -41,8 +43,8 @@ public class Add : Command.ICommand {
         }
 
         if (obstacle != Obstacle.Guard) {
-            string cardinal = args[4];
 
+            string cardinal = args[4];
             if (obstacle == Obstacle.Fence &&
                 (!Orientations.Contains(cardinal))) {
                 return "Orientation must be 'east' or 'north'.";
@@ -73,14 +75,21 @@ public class Add : Command.ICommand {
             case Obstacle.Guard:
                 Active.Guard(int.Parse(args[2]), int.Parse(args[3]));
                 break;
+
             case Obstacle.Fence:
                 Active.Fence(int.Parse(args[2]), int.Parse(args[3]), args[4],
                              int.Parse(args[5]));
                 break;
+
             case Obstacle.Sensor:
                 Active.Sensor(int.Parse(args[2]), int.Parse(args[3]),
                               double.Parse(args[4]));
                 break;
+
+            case Obstacle.Camera:
+                Active.Camera(int.Parse(args[2]), int.Parse(args[3]), args[4]);
+                break;
+
         }
 
         return $"Successfully added {args[1]} obstacle.";
@@ -100,5 +109,10 @@ public class Add : Command.ICommand {
         if (args.Length != 5)
             return "Incorrect number of arguments.";
         return Process(args, Obstacle.Sensor);
+    }
+    private string Camera(string[] args) {
+        if (args.Length != 5)
+            return "Incorrect number of arguments.";
+        return Process(args, Obstacle.Camera);
     }
 }
