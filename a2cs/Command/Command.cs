@@ -3,9 +3,11 @@
 namespace a2cs;
 
 /// <summary>
-/// Main loop for handling user input:
+/// Main runtime loop management for handling user input and displaying feedback.
+///
 /// Parses a command into an array of arguments,
-/// Calls the relevant command's handler using pattern matching, passing the array of arguments as a
+/// Calls the relevant command's handler using pattern matching, passing the
+/// argument array as a parameter.
 /// parameter.
 /// </summary>
 public class Command {
@@ -36,7 +38,6 @@ public class Command {
             }
 
             string[] args = input.ToLower().Split(" ");
-            // Console.WriteLine("in: [{0}]", string.Join(", ", args));
 
             ICommand cmd = args[0] switch {
                 "add" => new Add(),

@@ -43,8 +43,8 @@ public class Path : Command.ICommand {
 
         return "any";
 
-        // rudimentary implementation, might want to expand scope of walker if a valid path
-        // exists but can't be found.
+        // result from below might be too rudimentary of an implementation, might want to expand scope
+        // of walker if a valid path exists but can't be found.
     }
 }
 
@@ -53,7 +53,7 @@ public class Path : Command.ICommand {
     // public bool Walk(int[] maze, List<(int, int)> unsafeWall, int[] agent, int[] goal, bool[][] seen, int[][] path) {
         // base cases
         // ...
-        // (thjis is from my ts algos but u get the point). ...
+        // (this is typescript but the idea is there)
         //
         // 	if (curr.x < 0 || curr.x >= maze[0].length ||
         //         curr.y < 0 || curr.y >= maze.length) {
@@ -86,7 +86,7 @@ public class Path : Command.ICommand {
     // }
 
     // public int[][] FindPath(int[] maze, List<(int,int)> unsafeCell, int[] agent, int[] goal) {
-        // impl recursive walker with stack
+        // impl recursive walker with stack that it can push/pop from
         // something along these lines:
         //
         // 	const seen: boolean[][] = [];
