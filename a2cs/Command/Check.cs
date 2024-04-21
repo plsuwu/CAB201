@@ -34,6 +34,12 @@ public class Check : Command.ICommand {
             int[] parsedCoordinates = new int[4];
 
             // check camera in a 3x3 square centered around cell at (x,y)
+            // this still isnt 100%  -- see test case #28 for example.
+            //      - doesnt work on `check x y` until map is called to render
+            //          that region (?)
+            //      - clearly broken camera impl here because it directs to a region with
+            //          a camera & coord printing indicates no camera presence...
+            //  might be good to refactor out nonsense and come back to this??
             coordinates[0].SetValue(start, x - 1); // offset by -1
             coordinates[1].SetValue(start, y - 1);
             coordinates[0].SetValue(size, 3); // offset by + 1
@@ -68,16 +74,16 @@ public class Check : Command.ICommand {
             if (!fixedObstacles.Any(obstacle =>
                                         obstacle.Item1.Item1 == xAdjacent &&
                                         obstacle.Item1.Item2 == yAdjacent)) {
-                foreach (var val in fixedObstacles) {
-                    Console.WriteLine("({0}, {1}), {2}, {3}", val.Item1.Item1, val.Item1.Item2, val.Item2, val.Item3);
-                }
+                // foreach (var val in fixedObstacles) {
+                //     Console.WriteLine("({0}, {1}), {2}, {3}", val.Item1.Item1, val.Item1.Item2, val.Item2, val.Item3);
+                // }
                 safe.Add(dir.Key);
             }
         }
 
-        foreach (var s in safe) {
-            Console.WriteLine("{0}", s);
-        }
+        // foreach (var s in safe) {
+        //     Console.WriteLine("{0}", s);
+        // }
 
         if (safe.Count < 1) {
             return "You cannot safely move in any direction. Abort mission.";
