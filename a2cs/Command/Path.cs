@@ -2,6 +2,8 @@ namespace a2cs;
 
 public class Path : Command.ICommand {
 
+    static readonly int[][] Directions = [[-1, 0], [1, 0], [0, 1], [0, -1]];
+
     public string Handler(string[] args) {
         if (args.Length != 5) {
             return "Incorrect number of arguments.";
@@ -26,7 +28,7 @@ public class Path : Command.ICommand {
             }
         } catch (Exception e) {
             if (e is FormatException || e is ArgumentException) {
-                return "Coordinates are not valid integers.";
+                return "Agent coordinates are not valid integers.";
             }
         }
 

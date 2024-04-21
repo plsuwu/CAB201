@@ -4,18 +4,21 @@ class Render {
 
     // this is a really neat solution for objects blocking cells we can precalculate, which i dont think will work for
     // the camera obstacle.
-    public string[] Map(Map.Coordinates southwest, Map.Coordinates size) {
+    public string[] Map(Map.Coordinates start, Map.Coordinates size) {
 
         // using `LinkedList<T>` here as this function only wants nodes appended to its structure
         LinkedList<string> map = new LinkedList<string>();
         List<((int, int), char)> fixedObstacles = Active.fixedObstacles;
 
-        int xSize = size.X - southwest.X;
-        int ySize = size.Y - southwest.Y;
-
-        for (int y = 0; y < ySize; ++y) {
+        for (int i = 0; i < size.Y; ++i) {
             LinkedList<char> line = new LinkedList<char>(); // create a new list for each line
-            for (int x = 0; x < xSize; ++x) {
+
+            // the starting (x, y) coordinates are not related to the map width/height, so a separate iterator
+            // must be used to correctly determine the value of each
+            int y = i + start.Y;
+
+            for (int j = 0; j < size.X; ++j) {
+                int x = j + start.X;
 
                 // bind the first matching `fixedObstacles` tuple by comparing to the iterator's current cell (x,y)
                 // if there is no match, bind a default value.

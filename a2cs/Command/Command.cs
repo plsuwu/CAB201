@@ -46,7 +46,17 @@ public class Command {
                 _ => new Error(),
             };
 
-            Console.WriteLine(cmd.Handler(args));
+            var parsed = cmd.Handler(args);
+            if (parsed.Contains("\n")) {
+                string[] lines = parsed.Split("\n");
+                foreach (string line in lines) {
+                    Console.WriteLine(line);
+                }
+            } else {
+                Console.WriteLine(parsed);
+            }
+
+
 
         } while (true);
     }

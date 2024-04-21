@@ -30,7 +30,7 @@ public class Check : Command.ICommand {
             int xAdjacent = x + dir.Value[0];
             int yAdjacent = y + dir.Value[1];
 
-            Console.WriteLine($"{xAdjacent}, {yAdjacent}");
+            // Console.WriteLine($"{xAdjacent}, {yAdjacent}");
 
             if (!fixedObstacles.Any(obstacle =>
                                         obstacle.Item1.Item1 == xAdjacent &&
