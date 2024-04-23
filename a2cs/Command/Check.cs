@@ -39,6 +39,7 @@ public class Check : Command.ICommand {
             //          that region (?)
             //      - clearly broken camera impl here because it directs to a region with
             //          a camera & coord printing indicates no camera presence...
+            //      - we could (worst case) just call the renderer and swallow the return???????
             //  might be good to refactor out nonsense and come back to this??
             coordinates[0].SetValue(start, x - 1); // offset by -1
             coordinates[1].SetValue(start, y - 1);
