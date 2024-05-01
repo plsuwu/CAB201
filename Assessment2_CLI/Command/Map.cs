@@ -35,6 +35,10 @@ class Map : Command.ICommand {
             coordinates[i].SetValue(size, int.Parse(rawCoordinates[(i + 2)]));
         }
 
+        if (southwest.X > size.X || southwest.Y > size.Y) {
+            return "Width and height must be valid positive integers.";
+        }
+
         Render render = new Render();
         string[] map = render.Map(southwest, size);
 

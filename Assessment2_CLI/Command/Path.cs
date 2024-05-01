@@ -41,10 +41,25 @@ public class Path : Command.ICommand {
         Render renderer = new Render();
         string[] render = renderer.Map(agent, goal);
 
-        return "any";
 
+        return string.Join("\n", render);
         // result from below might be too rudimentary of an implementation, might want to expand scope
         // of walker if a valid path exists but can't be found.
+        // also, probably want to check that we aren't moving AWAY from the objective if there is a valid path
+        // that moves us closer...??
+        //      -> maybe a gradually expanding scope as a last resort is the best best here, so we are
+        //          'boxed in', so to speak.
+    }
+
+    private int[][] FindPath(string[] map, string safeCell, int[] agent, int[] goal) {
+        List<List<bool>> seen = new List<List<bool>>();
+        List<(int, int)> path = new List<(int, int)>();
+
+        for (var i = 0; i < map.Count(); ++i) {
+            var line_chars = map[i];
+        }
+
+        return [[1,0]];
     }
 }
 

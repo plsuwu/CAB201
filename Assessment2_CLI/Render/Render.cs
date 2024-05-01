@@ -1,57 +1,69 @@
 namespace a2cs;
 
+// could be cleaner but im taking a working implementation for now
 class Render {
-    public static void CameraBlocking(Map.Coordinates start, Map.Coordinates size,
-                               string direction, int x, int y) {
-        // Console.WriteLine($"camera obstacle facing {direction} at {x}, {y}??");
+    // maybe pull this out into `Obstacle.cs`
+    public static void CameraBlocking(Map.Coordinates start,
+                                      Map.Coordinates size, string direction,
+                                      int x, int y) {
+        int hMax =
+           Math.Min(start.X, x) + Math.Max(size.X - 1, x);  // represents the maximum horizontal distance
+                                   // for a horizontally-oriented camera
+        int vMax = Math.Min(start.Y, y) + Math.Max(size.Y - 1, y);  // vertically-oriented counterpart of the above binding
 
-        // could be cleaner but im taking the functional implementation for the time
-        // being
-
-        int hMax = start.X + size.X - 1; // represents the maximum horizontal distance for an E/W-facing camera
-        int vMax = start.Y + size.Y - 1; // maximum vertical distance for a N/S-facing camera
-
-        // Console.WriteLine(
-        //     $"map(xy), (xy): ({start.X},{start.Y}), ({hMax}, {vMax})");
-
-        // shrimple as
         switch (direction) {
             case "north":
 
-                // vertical iterator increases y coordinate (ie, walks north), until the
-                // top of the map is exceeded
+                // vertical iterator increments y coordinate (ie, walks north)
+                // until the top of the map is reached
                 for (int i = 0; y + i <= vMax; ++i) {
-
-                    // for each step upward, offset the horizontal vision by
-                    // the same value on either side of the camera center
+                    // for each upward iteration, incrementally offset the
+                    // horizontal vision either side of the camera center;
+                    // reading from bottom to top:
+                    //
+                    // ```
+                    //
+                    //      .ccc|c|ccc    // j -> iteration 3 (and so on...)
+                    //      ..cc|c|cc.    // j -> iteration 2; new `C` @
+                    //      [(3,2),(4,2),(5,2),(6,2),(7,2)]
+                    //      ...c|c|c..    // j -> iteration 1; new `C` @
+                    //      [(4,1),(5,1),(6,1)]
+                    //      ....|c|...    // j -> iteration 0; new `C` @ [(5,0)]
+                    //           ^
+                    //           camera center
+                    // ```
+                    //
                     for (int j = -i; j <= i; ++j) {
-
-                        // if the current i & j iterators represent a coordinate inside
-                        // the map, push that value to the list of active obstacles
+                        // if the current i & j iterators represent a coordinate
+                        // inside the map, push that value to the list of active
+                        // obstacles
                         if (x + j >= start.X && x + j <= hMax) {
-                            Active.fixedObstacles.Add(((x + j, y + i), 'C', null));
+                            Active.fixedObstacles.Add(
+                                ((x + j, y + i), 'C', null));
                         }
                     }
                 }
                 break;
 
             case "south":
-                // similar to above but decrement y to walk down
+                // as above but decrement y to walk down
                 for (int i = 0; y - i >= start.Y; ++i) {
                     for (int j = -i; j <= i; ++j) {
                         if (x + j >= start.X && x + j <= hMax) {
-                            Active.fixedObstacles.Add(((x + j, y - i), 'C', null));
+                            Active.fixedObstacles.Add(
+                                ((x + j, y - i), 'C', null));
                         }
                     }
                 }
                 break;
 
+            // swap x/y & v/h in above cases to walk horizontally
             case "east":
-                // swap x with y from the above two cases to walk horizontally rather than vertically
                 for (int i = 0; x + i <= hMax; ++i) {
                     for (int j = -i; j <= i; ++j) {
                         if (y + j >= start.Y && y + j <= vMax) {
-                            Active.fixedObstacles.Add(((x + i, y + j), 'C', null));
+                            Active.fixedObstacles.Add(
+                                ((x + i, y + j), 'C', null));
                         }
                     }
                 }
@@ -60,8 +72,9 @@ class Render {
             case "west":
                 for (int i = 0; x - i >= start.X; ++i) {
                     for (int j = -i; j <= i; ++j) {
-                        if (y + j >= start.X && x + j <= hMax) {
-                            Active.fixedObstacles.Add(((x - i, y + j), 'C', null));
+                        if (y + j >= start.Y && y + j <= vMax) {
+                            Active.fixedObstacles.Add(
+                                ((x - i, y + j), 'C', null));
                         }
                     }
                 }
@@ -72,11 +85,9 @@ class Render {
     }
 
     public string[] Map(Map.Coordinates start, Map.Coordinates size) {
-        // using `LinkedList<T>` here as this function only wants nodes added to
-        // the head or tail of its structure
+        // using `LinkedList` to build a FILO/stack structure
         LinkedList<string> map = new LinkedList<string>();
         List<((int, int), char, string?)> fixedObstacles = Active.fixedObstacles;
-
 
         // check for cameras and create their blocking zones -- might be more
         // performant to create a new List<T> here (shouldn't affect
@@ -94,23 +105,36 @@ class Render {
          *
          *      --> haven't thought this through so idk how
          *          it would work given the obstacle chars & the
-         *          nullable string.
+         *          nullable string - hashset of a list perhaps?
+         *
+         *      --> alternatively, we just check to see if that location
+         *          already has a camera instance, only pushing
+         *          the coordinates if not.
          * -----------------------------------------------------
          */
+
+        // if there are any camera obstacles in the active obstacles list, get
+        // their coordinates
         if (fixedObstacles.Any(obstacle => obstacle.Item2 == 'C')) {
             var cameras =
                 fixedObstacles.FindAll(obstacle => obstacle.Item2 == 'C');
 
             foreach (var camera in cameras) {
-                if (camera.Item3 is not null) {
-                    // call a camera activation function that will use a known map
-                    // area to determine relevant camera blocking sections.
+                if (camera.Item3 is not
+                        null) {  // if the camera has a direction in its list
+                                 // entry, it is the base camera location
+
+                    // call the above camera activation method that will use a
+                    // known map area to determine relevant blocking locations.
                     CameraBlocking(start, size, camera.Item3,
                                    camera.Item1.Item1, camera.Item1.Item2);
+
+                    // avoid nulling `camera.Item3` here so a render can still
+                    // be correctly generated if a new render is called with a
+                    // larger area
                 }
             }
         }
-
         for (int i = 0; i < size.Y; ++i) {
             LinkedList<char> line =
                 new LinkedList<char>();  // create a new list for each line

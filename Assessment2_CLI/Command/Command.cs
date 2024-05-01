@@ -1,17 +1,12 @@
 #pragma warning disable CS8602
+// XML annotations still to come - in the mean time i have left regular inline
+// comments in lieu of XML.
 
 namespace a2cs;
 
 /// <summary>
-/// Main runtime manager to parse commands and display related feedback to user input.
+/// Main runtime manager to parse commands and return associated feedback on user input to stdout.
 /// </summary>
-/// <remarks>
-/// Facilitates `stdio` access between any given command's logic and the `Main()` function
-/// via the `<i>ICommand</i>` interface, which provides the `Handler()` function to funnel
-/// IO to and from any new Command object that is created. Each Command object handles its own logic
-/// internally, but will return via this interface as either an error or result string, which
-/// can be used by <c>Command</c> as part of a `stdio` operation.
-/// </remarks>
 public class Command {
 
     public interface ICommand {
@@ -20,7 +15,7 @@ public class Command {
 
     private class Error : ICommand {
         public string Handler(string[] args) {
-            return $"Invalid option: {args[0]}.";
+            return $"Invalid option: {args[0]}.\nType 'help' to see a list of commands.";
         }
     }
 

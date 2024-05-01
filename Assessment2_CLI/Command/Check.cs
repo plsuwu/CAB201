@@ -18,47 +18,35 @@ public class Check : Command.ICommand {
             return "Coordinates are not valid integers.";
         }
 
-        if (Active.fixedObstacles.Any(obstacle => obstacle.Item2 == 'C')) {
-            var cameras =
-                Active.fixedObstacles.FindAll(obstacle => obstacle.Item2 == 'C');
+        var coordinates = typeof(Map.Coordinates).GetFields();
 
-            /**                 refactor me!!               */
-            // needs to be pulled out into a separate fn
-            // (code ripped wholesale from `Map.cs` here)
-            var coordinates = typeof(Map.Coordinates).GetFields();
+        Map.Coordinates southwest = new Map.Coordinates();
+        Map.Coordinates size = new Map.Coordinates();
 
-            Map.Coordinates start = new Map.Coordinates();
-            Map.Coordinates size = new Map.Coordinates();
-            // Render render = new Render();
+        string[] rawCoordinates = args.Skip(1).ToArray();
+        int[] parsedCoordinates = new int[4];
 
-            int[] parsedCoordinates = new int[4];
-
-            // check camera in a 3x3 square centered around cell at (x,y)
-            // this still isnt 100%  -- see test case #28 for example.
-            //      - doesnt work on `check x y` until map is called to render
-            //          that region (?)
-            //      - clearly broken camera impl here because it directs to a region with
-            //          a camera & coord printing indicates no camera presence...
-            //      - we could (worst case) just call the renderer and swallow the return???????
-            //  might be good to refactor out nonsense and come back to this??
-            coordinates[0].SetValue(start, x - 1); // offset by -1
-            coordinates[1].SetValue(start, y - 1);
-            coordinates[0].SetValue(size, 3); // offset by + 1
-            coordinates[1].SetValue(size, 3);
-
-            /**
-             *                  refactor ahbopve!!!!!!!
-             * */
-
-            // this (from 'render' (?)) also could probably use its own fn call
-            foreach (var camera in cameras) {
-                if (camera.Item3 is not null) {
-                    Render.CameraBlocking(start, size, camera.Item3,
-                                          camera.Item1.Item1,
-                                          camera.Item1.Item2);
-                }
+        try {
+            for (int i = 0; i < rawCoordinates.Length; ++i) {
+                parsedCoordinates[i] = int.Parse(rawCoordinates[i]);
+            }
+        } catch (Exception e) {
+            if (e is FormatException || e is ArgumentException) {
+                return "Coordinates are not valid integers.";
             }
         }
+
+        // (i < 2) where | 2 == args.Skip(1).Length
+        for (int i = 0; i < 1; ++i) {
+            coordinates[i].SetValue(southwest, int.Parse(rawCoordinates[i]));
+            coordinates[i].SetValue(size, int.Parse(rawCoordinates[(i)]));
+        }
+
+        Render render = new Render();
+
+        // render method only parsing a 1x1 square here; does not take into account
+        // the overall 3x3 checked section below.
+        string[] map = render.Map(southwest, size);
 
         List<((int, int), char, string?)> fixedObstacles = Active.fixedObstacles;
         if (fixedObstacles.Any(obstacle => obstacle.Item1.Item1 == x &&
