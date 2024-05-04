@@ -1,5 +1,6 @@
 namespace a2cs;
 
+// rename file and dump consts in here maybe
 public class Help {
     public const string __HELP = @"
 Valid commands are:

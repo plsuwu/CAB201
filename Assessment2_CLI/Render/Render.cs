@@ -2,15 +2,16 @@ using System.Text;
 namespace a2cs;
 
 // forced to refactor as two important data structure choices were fundamentally incorrect:
-//  - blockedCells: originally used `List<((int,int), char, string?)>`  => disgustingly poor lookup,
-//  - map:          originally used `LinkedList<LinkedList<char>>`      => cursed mem alloc/dealloc overhead
+//  - blockedCells: originally using `List<((int,int), char, string?)>`  => disgustingly poor lookup perf
+//  - map:          originally using `LinkedList<LinkedList<char>>`      => cursed alloc/dealloc overhead
 //
-// this was slowing the `Map` method below to an absolute crawl lol
+// this was slowing the method below to an absolute crawl lol
 class Render {
 
     public string[] Map(Grid.Cell start, Grid.Cell size) {
         List<string> map = new List<string>();
 
+        // clone the obstacles dict so we can iterate over it without throwing when camera blocking cells are added
         var blockedCellsClone = new Dictionary<(int, int), (char, string?)>(Obstacle.blockedCells);
         foreach (var obstacle in blockedCellsClone) {
             if (obstacle.Value.Item1 == 'C' && obstacle.Value.Item2 != null) {
@@ -19,6 +20,9 @@ class Render {
         }
 
         for (int i = 0; i < size.Y; ++i) {
+
+            // i think this implementation was different in my original solution,
+            // so i think it is ok to start the i/j iterators at their start.Y/start.X values.
             int y = i + start.Y;
             StringBuilder line = new StringBuilder();
 

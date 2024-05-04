@@ -2,10 +2,13 @@ namespace a2cs;
 
 class Camera {
 
+    // push the core camera location to the obstacles dict - this will be probably created once a
+    // grid size is given
     public static void Add(int x, int y, string? direction) {
         Obstacle.New(x, y, 'C', direction);
     }
 
+    // uses a known grid area to create the full blocking effect of a camera
     public static void GetBlockedCells(Grid.Cell start, Grid.Cell size, int x, int y, string direction) {
         int hMax = Math.Min(start.X, x) + Math.Max(size.X - 1, x);
         int vMax = Math.Min(start.Y, y) + Math.Max(size.Y - 1, y);

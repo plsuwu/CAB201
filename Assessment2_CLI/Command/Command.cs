@@ -1,6 +1,4 @@
-#pragma warning disable CS8602
-// haven't made my way around to XML annotations + a little refactoring to do
-
+#pragma warning disable CS8602 // Dereference of a possibly null reference
 namespace a2cs;
 
 /// <summary>
@@ -8,7 +6,9 @@ namespace a2cs;
 /// user input to stdout.
 /// </summary>
 public class Command {
-    // are the constant defs going a little overboard/in the right place?
+
+    // are the constant defs going overboard? ideally i dump the
+    // reusable consts into their own little module and set access to public
     private const string __PROMPT = "Enter command:";
     private const int __ARG_COMMAND_NAME = 0;
 
@@ -16,19 +16,17 @@ public class Command {
         string Handler(string[] args);
     }
 
-    private class Error : ICommand {
+    private class InputError : ICommand {
         public string Handler(string[] args) {
             return $"Invalid option: {args[__ARG_COMMAND_NAME]}.\nType 'help' to see a list of commands.";
         }
     }
 
     private string? input;
-
     public void InputLoop() {
         do {
             Console.WriteLine(__PROMPT);
             input = Console.ReadLine().Trim();
-
             if (input == "exit") {
                 break;
             }
@@ -40,22 +38,21 @@ public class Command {
             string[] args = input.ToLower().Split(" ");
 
             ICommand cmd = args[__ARG_COMMAND_NAME] switch {
-                "add"   => new Add(),
+                "add" => new Add(),
                 "check" => new Check(),
-                "map"   => new Map(),
-                "path"  => new Path(),
-                _       => new Error(),
+                "map" => new Map(),
+                "path" => new Path(),
+                _ => new InputError(),
             };
 
             var parsed = cmd.Handler(args);
-
             if (parsed.Contains("\n")) {
                 string[] lines = parsed.Split("\n");
-
                 foreach (string line in lines) {
                     Console.WriteLine(line);
                 }
             } else {
+
                 Console.WriteLine(parsed);
             }
 

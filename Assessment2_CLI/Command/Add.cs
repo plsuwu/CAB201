@@ -1,10 +1,6 @@
 namespace a2cs;
-// big class (+ some potentially redundant logic), could do with some abstraction and
-// refactoring
 
-/// <summary>
-/// Logic for parsing and executing `add` command
-/// </summary>
+// this is a big ugly class that needs refactoring and condensing
 public class Add : Command.ICommand {
 
     private const int __MIN_ARG_LENGTH_ANY = 2;

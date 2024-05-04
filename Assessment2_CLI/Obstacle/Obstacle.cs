@@ -1,6 +1,8 @@
 namespace a2cs;
 
 public class Obstacle {
+
+    // globally accessible dict of cells containing an obstacle
     static public Dictionary<(int, int), (char, string?)> blockedCells =
         new Dictionary<(int, int), (char, string?)>();
 
