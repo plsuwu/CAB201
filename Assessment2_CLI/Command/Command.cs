@@ -1,13 +1,15 @@
 #pragma warning disable CS8602
-// XML annotations still to come - in the mean time i have left regular inline
-// comments in lieu of XML.
+// haven't made my way around to XML annotations,
+// also much tidying up to do,
 
 namespace a2cs;
 
 /// <summary>
-/// Main runtime manager to parse commands and return associated feedback on user input to stdout.
+/// Main runtime manager to parse commands and return associated feedback on
+/// user input to stdout.
 /// </summary>
 public class Command {
+    private const string __PROMPT = "Enter command:";
 
     public interface ICommand {
         string Handler(string[] args);
@@ -23,24 +25,22 @@ public class Command {
 
     public void InputLoop() {
         do {
-            Console.WriteLine(Output.Info.Prompt);
+            Console.WriteLine(__PROMPT);
             input = Console.ReadLine().Trim();
 
             if (input == "exit") {
                 break;
             }
             if (input == "help") {
-                Console.WriteLine(Output.Info.Help);
+                Console.WriteLine(Help.__HELP);
                 continue;
             }
 
             string[] args = input.ToLower().Split(" ");
 
             ICommand cmd = args[0] switch {
-                "add" => new Add(),
-                "check" => new Check(),
-                "map" => new Map(),
-                "path" => new Path(),
+                "add" => new Add(), "check" => new Check(),
+                "map" => new Map(), "path" => new Path(),
                 _ => new Error(),
             };
 

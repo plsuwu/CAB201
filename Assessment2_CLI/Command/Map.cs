@@ -2,45 +2,49 @@ namespace a2cs;
 
 class Map : Command.ICommand {
 
-    public class Coordinates {
-        public int X;
-        public int Y;
-    }
+    private const int __START_CELL_INDEX = 0;
+    private const int __SIZE_CELL_INDEX = 1;
+    private const int __COORDINATE_PAIRS = 2;
+    private const int __NUM_EXPECTED_ARGS = 5;
 
     public string Handler(string[] args) {
-        if (args.Length != 5) {
+        if (args.Length != __NUM_EXPECTED_ARGS) {
             return "Incorrect number of arguments.";
         }
 
-        var coordinates = typeof(Coordinates).GetFields();
-
-        Coordinates southwest = new Coordinates();
-        Coordinates size = new Coordinates();
-
         string[] rawCoordinates = args.Skip(1).ToArray();
-        int[] parsedCoordinates = new int[4];
+
+        // logic from here until about line 44 could be pulled out into its own
+        // method
+        int[] parsedCoordinates = new int[rawCoordinates.Length];
 
         try {
             for (int i = 0; i < rawCoordinates.Length; ++i) {
                 parsedCoordinates[i] = int.Parse(rawCoordinates[i]);
             }
-        } catch (Exception e) {
-            if (e is FormatException || e is ArgumentException) {
+        } catch (Exception err) {
+            if (err is FormatException || err is ArgumentException) {
                 return "Coordinates are not valid integers.";
             }
         }
 
-        for (int i = 0; i < args.Length / 2; ++i) {
-            coordinates[i].SetValue(southwest, int.Parse(rawCoordinates[i]));
-            coordinates[i].SetValue(size, int.Parse(rawCoordinates[(i + 2)]));
+        int[] startCell = new int[__COORDINATE_PAIRS];
+        int[] sizeOfGrid = new int[__COORDINATE_PAIRS];
+
+        for (int i = 0; i < parsedCoordinates.Length / __COORDINATE_PAIRS; ++i) {
+            if (parsedCoordinates[i] > parsedCoordinates[i + __COORDINATE_PAIRS]) {
+                return "Width and height must be valid positive integers.";
+            }
+            startCell[i] = parsedCoordinates[i];
+            sizeOfGrid[i] = parsedCoordinates[i + __COORDINATE_PAIRS];
         }
 
-        if (southwest.X > size.X || southwest.Y > size.Y) {
-            return "Width and height must be valid positive integers.";
-        }
+        Grid grid = new Grid();
+        List<Grid.Cell> coordinates = grid.Build(startCell, sizeOfGrid);
 
         Render render = new Render();
-        string[] map = render.Map(southwest, size);
+        string[] map =
+            render.Map(coordinates[__START_CELL_INDEX], coordinates[__SIZE_CELL_INDEX]);
 
         return string.Join("\n", map);
     }

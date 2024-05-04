@@ -1,6 +1,13 @@
 namespace a2cs;
 
 public class Check : Command.ICommand {
+
+    private const int __MIN_SAFE_CELLS = 1;
+    private const int __DIR_X_INDEX = 0;
+    private const int __DIR_Y_INDEX = 1;
+    private const int __START_CELL_INDEX = 0;
+    private const int __SIZE_CELL_INDEX = 1;
+
     private static readonly Dictionary<string, int[]> directions =
         new Dictionary<string, int[]> {
             { "North", new int[] { 0, 1 } },
@@ -13,40 +20,19 @@ public class Check : Command.ICommand {
         if (args.Length != 3) {
             return "Incorrect number of arguments.";
         }
-        if (!int.TryParse(args[1], out int x) ||
-            !int.TryParse(args[2], out int y)) {
+        if (!int.TryParse(args[1], out int x) || !int.TryParse(args[2], out int y)) {
             return "Coordinates are not valid integers.";
         }
 
-        var coordinates = typeof(Map.Coordinates).GetFields();
+        int[] startCell = { x - 1, y - 1 };
+        int[] sizeOfGrid = { x + 1, y + 1 };
 
-        Map.Coordinates southwest = new Map.Coordinates();
-        Map.Coordinates size = new Map.Coordinates();
-
-        string[] rawCoordinates = args.Skip(1).ToArray();
-        int[] parsedCoordinates = new int[4];
-
-        try {
-            for (int i = 0; i < rawCoordinates.Length; ++i) {
-                parsedCoordinates[i] = int.Parse(rawCoordinates[i]);
-            }
-        } catch (Exception e) {
-            if (e is FormatException || e is ArgumentException) {
-                return "Coordinates are not valid integers.";
-            }
-        }
-
-        // (i < 2) where | 2 == args.Skip(1).Length
-        for (int i = 0; i < 1; ++i) {
-            coordinates[i].SetValue(southwest, int.Parse(rawCoordinates[i]));
-            coordinates[i].SetValue(size, int.Parse(rawCoordinates[(i)]));
-        }
+        Grid grid = new Grid();
+        List<Grid.Cell> coordinates = grid.Build(startCell, sizeOfGrid);
 
         Render render = new Render();
-
-        // render method only parsing a 1x1 square here; does not take into account
-        // the overall 3x3 checked section below.
-        string[] map = render.Map(southwest, size);
+        string[] map =
+            render.Map(coordinates[__START_CELL_INDEX], coordinates[__SIZE_CELL_INDEX]);
 
         List<((int, int), char, string?)> fixedObstacles = Active.fixedObstacles;
         if (fixedObstacles.Any(obstacle => obstacle.Item1.Item1 == x &&
@@ -57,24 +43,16 @@ public class Check : Command.ICommand {
         List<string> safe = new List<string>();
 
         foreach (var dir in directions) {
-            int xAdjacent = x + dir.Value[0];
-            int yAdjacent = y + dir.Value[1];
+            int adjacentXCell = x + dir.Value[__DIR_X_INDEX];
+            int adjacentYCell = y + dir.Value[__DIR_Y_INDEX];
 
-            if (!fixedObstacles.Any(obstacle =>
-                                        obstacle.Item1.Item1 == xAdjacent &&
-                                        obstacle.Item1.Item2 == yAdjacent)) {
-                // foreach (var val in fixedObstacles) {
-                //     Console.WriteLine("({0}, {1}), {2}, {3}", val.Item1.Item1, val.Item1.Item2, val.Item2, val.Item3);
-                // }
+            if (!fixedObstacles.Any(obstacle => obstacle.Item1.Item1 == adjacentXCell &&
+                                                obstacle.Item1.Item2 == adjacentYCell)) {
                 safe.Add(dir.Key);
             }
         }
 
-        // foreach (var s in safe) {
-        //     Console.WriteLine("{0}", s);
-        // }
-
-        if (safe.Count < 1) {
+        if (safe.Count < __MIN_SAFE_CELLS) {
             return "You cannot safely move in any direction. Abort mission.";
         }
 
