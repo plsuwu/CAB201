@@ -14,8 +14,7 @@ class Map : Command.ICommand {
 
         string[] rawCoordinates = args.Skip(1).ToArray();
 
-        // logic from here until about line 44 could be pulled out into its own
-        // method
+        // next ~22 lines can probably be refactored into standalone method
         int[] parsedCoordinates = new int[rawCoordinates.Length];
 
         try {
@@ -32,7 +31,7 @@ class Map : Command.ICommand {
         int[] sizeOfGrid = new int[__COORDINATE_PAIRS];
 
         for (int i = 0; i < parsedCoordinates.Length / __COORDINATE_PAIRS; ++i) {
-            if (parsedCoordinates[i] > parsedCoordinates[i + __COORDINATE_PAIRS]) {
+            if (parsedCoordinates[i + __COORDINATE_PAIRS] <= 0) {
                 return "Width and height must be valid positive integers.";
             }
             startCell[i] = parsedCoordinates[i];
@@ -46,6 +45,6 @@ class Map : Command.ICommand {
         string[] map =
             render.Map(coordinates[__START_CELL_INDEX], coordinates[__SIZE_CELL_INDEX]);
 
-        return string.Join("\n", map);
+        return string.Join("\n", map.Reverse());
     }
 }

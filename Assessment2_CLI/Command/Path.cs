@@ -7,6 +7,8 @@ public class Path : Command.ICommand {
     private const int __COORDINATE_PAIRS = 2;
     private const int __NUM_EXPECTED_ARGS = 5;
 
+    private const int __ARG_OBJECTIVE_X_INDEX = 2;
+
     public string Handler(string[] args) {
         if (args.Length != __NUM_EXPECTED_ARGS) {
             return "Incorrect number of arguments.";
@@ -23,10 +25,11 @@ public class Path : Command.ICommand {
                 parsedCoordinates[i] = int.Parse(rawCoordinates[i]);
             } catch (Exception err) {
                 if (err is FormatException || err is ArgumentException) {
-                    return i < 2 ?
-                    // note that this line differs to the one in `Map.cs`
-                    "Agent coordinates are not valid integers."
-                      : "Objective coordinates are not valid integers.";
+                    return i < __ARG_OBJECTIVE_X_INDEX
+                               ?
+                               // note that this line differs to the one in `Map.cs`
+                               "Agent coordinates are not valid integers."
+                               : "Objective coordinates are not valid integers.";
                 }
             }
         }
