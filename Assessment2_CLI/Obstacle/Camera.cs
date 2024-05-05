@@ -10,11 +10,16 @@ class Camera {
 
     // uses a known grid area to create the full blocking effect of a camera
     public static void GetBlockedCells(Grid.Cell start, Grid.Cell size, int x, int y, string direction) {
+
         int hMax = Math.Min(start.X, x) + Math.Max(size.X - 1, x);
         int vMax = Math.Min(start.Y, y) + Math.Max(size.Y - 1, y);
 
         switch (direction) {
 
+            // using the camera's direction to determine the where camera's 'core' sightline points, walk
+            // down that core until the furthest horizontal or vertical coordinate containing a cell is
+            // reached, incrementally expanding the vision around the core sightline in a triangle by
+            // adding the same number of steps taken to both sides of the core.
             case "north":
                 for (int i = 0; y + i <= vMax; ++i) {
                     int stepXLower = Math.Max(start.X, x - i);

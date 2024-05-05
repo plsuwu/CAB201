@@ -1,12 +1,9 @@
 ﻿namespace a2cs;
 
 // i haven't made my way around to XML annotations + i have a little refactoring to do anyway;
-// so the file structure/program flow isnt set in STONE, but should indicate a thought process
-// of some description.
+// so the file structure/program flow isnt set in STONE, but should indicate my general thought process
+// to some degree.
 //
-// i am unsure if i will have the energy to fully implement the logic in `Command/Path.cs`
-// before 12 tonight -its a little messy anyway - but the other commands are functioning how they
-// should (according to gradescope).
 
 class Program {
     private const string __WELCOME =

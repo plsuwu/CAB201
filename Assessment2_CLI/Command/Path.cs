@@ -1,6 +1,8 @@
 namespace a2cs;
 
-// this isnt quite finished so its a little messy
+// doesn't return any kind of expected response - i am still trying to figure out what
+// i'm doing with this.
+// this is only just started so it is pretty messy:))
 public class Path : Command.ICommand {
 
     private const int __ARG_OBJECTIVE_X_INDEX = 2;
@@ -17,7 +19,6 @@ public class Path : Command.ICommand {
     private static readonly HashSet<char> __BLOCKED_CELL_CHARS =
         new HashSet<char> { 'G', 'F', 'S', 'C' };
 
-    // i've slightly modified the order here; it does a fun little spiral
     private static readonly Dictionary<string, int[]> directions =
         new Dictionary<string, int[]> {
             { "North", new int[] { 0, 1 } },
@@ -25,6 +26,14 @@ public class Path : Command.ICommand {
             { "South", new int[] { 0, -1 } },
             { "West", new int[] { -1, 0 } },
         };
+
+    // testing purposes, will likely want to use above dict
+    private static readonly int[][] dirsArray = {
+        new int[] { 0, 1 },
+        new int[] { 1, 0 },
+        new int[] { 0, -1 },
+        new int[] { -1, 0 },
+    };
 
     private char[][] SplitMap(string[] map, int[] gridSize) {
         var droppedMessage = map.Reverse().Skip(1).ToArray();
@@ -64,11 +73,21 @@ public class Path : Command.ICommand {
         int[] endCell = new int[__NUM_COORDINATE_PAIRS];
         int[] sizeOfGrid = new int[__NUM_COORDINATE_PAIRS];
 
+        // these could implement IEnumerable to instantiate easier?
+        Grid.Cell startAsCell = new Grid.Cell();
+        Grid.Cell goalAsCell = new Grid.Cell();
+
         for (int i = 0; i < parsedCoordinates.Length / __NUM_COORDINATE_PAIRS; ++i) {
             startCell[i] = parsedCoordinates[i];
             endCell[i] = parsedCoordinates[i + __NUM_COORDINATE_PAIRS];
             sizeOfGrid[i] = (Math.Abs(endCell[i]) + 1) - Math.Abs(startCell[i]);
         }
+
+        // this is not permanent but for the purpose of having something work
+        startAsCell.X = startCell[__DIR_X_INDEX];
+        startAsCell.Y = startCell[__DIR_Y_INDEX];
+        goalAsCell.X = endCell[__DIR_X_INDEX];
+        goalAsCell.Y = endCell[__DIR_Y_INDEX];
 
         Grid grid = new Grid();
         List<Grid.Cell> coordinates = grid.Build(startCell, sizeOfGrid);
@@ -78,23 +97,33 @@ public class Path : Command.ICommand {
             render.Map(coordinates[__INDEX_START_CELL], coordinates[__INDEX_END_CELL]);
 
         char[][] mapChars = SplitMap(mapRaw, sizeOfGrid);
-        Stack<(int, int)> path = FindPath(mapChars, coordinates[__INDEX_START_CELL],
-                                         coordinates[__INDEX_END_CELL]);
 
-        return "";
+        Console.WriteLine($"{startAsCell.X}, {startAsCell.Y}");
+        Console.WriteLine($"{goalAsCell.X}, {goalAsCell.Y}");
+        var path = FindPath(mapChars, startAsCell, goalAsCell);
+
+        // Console.WriteLine($"{path.Peek()}");
+
+        return ""; // we return junk right now and print to stdout while building
     }
 
-    private bool WalkMap(char[][] map, char safeChar, Grid.Cell current, Grid.Cell goal,
-                         Stack<(int, int)> path, bool[][] seen) {
+    // very much trying to make a start rather than be fully functional; this implementation will find a single
+    // path when that path is surrounded by obstacles but isn't so great for the actual task.
+    private bool WalkMap(char[][] map, Grid.Cell current, Grid.Cell goal,
+                         List<int[]> path, bool[][] seen) {
+
+        // Console.WriteLine($"standing on char: '{map[current.X][current.Y].ToString()}'.");
+        // (x < 0 || y < 0) so we dont just walk off into the distance but this might
+        // need to be modified if we need to walk back to move around an obstacle
         if (current.X < 0 || current.X >= map[0].Length || current.Y < 0 ||
             current.Y >= map.Length) {
             return false;
         }
-        if (map[current.X][current.Y] != safeChar) {
+        if (map[current.X][current.Y] != __SAFE_CHAR) {
             return false;
         }
-        if (current == goal) {
-            path.Push((goal.X, goal.Y));
+        if (current.X == goal.X && current.Y == goal.Y) {
+            path.Add([goal.X, goal.Y]);
             return true;
         }
         if (seen[current.X][current.Y]) {
@@ -102,32 +131,64 @@ public class Path : Command.ICommand {
         }
 
         seen[current.X][current.Y] = true;
-        path.Push((current.X, current.Y));
+        path.Add([current.X, current.Y]);
 
-        // debug
+        // log values to stdout as they are pushed
         Console.WriteLine($"added `{current.X},{current.Y}` to path stack.");
-        Console.WriteLine($"peeking stack: {path.Peek()}");
+        foreach (var coord_pair in path) {
+            Console.Write($"[ ({coord_pair[0]},{coord_pair[1]}) ] \n");
+        }
+
 
         // this needs to try to actively increment TOWARDS the goal else we just add
-        // every single free coord to stack, which isnt overly helpful.
-        foreach (var dir in directions) {
+        // every single free coord to stack, which isnt super helpful.
+        //
+        for (int i = 0; i < dirsArray.Length; ++i) {
+
+            // is this yielding the iterator value to return? is that how this has always worked??
+            // i feel like this little routine should:
+            //      1. increment the iterator,
+            //      2. use the iterator to index `dirsArray`,
+            //      3. bind adjacent to the sum of the current coord
+            //          with the indexed coordinate
+            //      4a. iterate through the dirsArray until we return true or
+            //          run out of directions to try, or,
+            //      4b. return true to the caller if we meet the
+            //          criteria, which should restart this iterator, no?
+            //
+            // but we see to push values to path indicating we're just doing the
+            // full loop and pushing the entire circle to `path`??
+            //            >
+            //         ^    v
+            //           <
+
             Grid.Cell adjacent = new Grid.Cell();
 
-            // could call Check method here instead?
-            adjacent.X = current.X + dir.Value[__DIR_X_INDEX];
-            adjacent.Y = current.Y + dir.Value[__DIR_Y_INDEX];
+            adjacent.X = current.X + dirsArray[i][0];
+            adjacent.Y = current.Y + dirsArray[i][1];
 
-            if (WalkMap(map, safeChar, adjacent, goal, path, seen)) {
+            Console.WriteLine($"{adjacent.X}, {adjacent.Y}");
+                    // const [x, y] = dir[i];
+                    // if (walk(maze, wall,
+                    // {
+                    //     x: curr.x + x,
+                    //     y: curr.y + y
+                    // },
+                    // end, seen, path))
+                    // {
+                    //     return true;
+                    // }
+            if (WalkMap(map, adjacent, goal, path, seen)) {
                 return true;
             }
         }
 
-        path.Pop();
+        path.RemoveAt(path.Count - 1);
         return false;
     }
 
-    private Stack<(int, int)> FindPath(char[][] map, Grid.Cell start, Grid.Cell goal) {
-        Stack<(int, int)> path = new Stack<(int, int)>();
+    private List<int[]> FindPath(char[][] map, Grid.Cell start, Grid.Cell goal) {
+        List<int[]> path = new List<int[]>();
         bool[][] seen = new bool [map.Length][];
 
         for (int i = 0; i < map.Length; ++i) {
@@ -135,7 +196,11 @@ public class Path : Command.ICommand {
         }
 
         Console.WriteLine($"starting @ {start.X}, {start.Y}");
-        WalkMap(map, __SAFE_CHAR, start, goal, path, seen);
+        WalkMap(map, start, goal, path, seen);
+
+        foreach (var coord in path) {
+            Console.WriteLine($"[ {coord[0]},{coord[1]} ], ");
+        }
 
         return path;
     }

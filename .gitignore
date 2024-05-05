@@ -1,4 +1,5 @@
-/**/bin/
-/**/obj/
-/**/target/
-/**/partial-a2.zip
+*/**/bin/
+*/**/obj/
+*/**/target/
+*/**/*.zip
+

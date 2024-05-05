@@ -2,7 +2,8 @@ namespace a2cs;
 
 public class Obstacle {
 
-    // globally accessible dict of cells containing an obstacle
+    // globally accessible dictionary of cells containing an obstacle - allows very
+    // efficient item lookup - no need to traverse each item in an array/list
     static public Dictionary<(int, int), (char, string?)> blockedCells =
         new Dictionary<(int, int), (char, string?)>();
 

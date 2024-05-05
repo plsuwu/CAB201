@@ -15,16 +15,17 @@ class Grid {
         List<Cell> coordinates = new List<Cell>();
 
         Cell startCell = new Cell {
-                X = start[__X_COORDINATE_INDEX],
-                Y = start[__Y_COORDINATE_INDEX]
-            };
-        Cell gridWH = new Cell {
-                X = size[__X_COORDINATE_INDEX],
-                Y = size[__Y_COORDINATE_INDEX]
-            };
+            X = start[__X_COORDINATE_INDEX],
+            Y = start[__Y_COORDINATE_INDEX]
+        };
+
+        Cell sizeOfGrid = new Cell {
+            X = size[__X_COORDINATE_INDEX],
+            Y = size[__Y_COORDINATE_INDEX]
+        };
 
         coordinates.Add(startCell);
-        coordinates.Add(gridWH);
+        coordinates.Add(sizeOfGrid);
 
         return coordinates;
     }
