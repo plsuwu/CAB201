@@ -1,4 +1,4 @@
-type Point = {
+ype Point = {
     x: number;
     y: number;
 };

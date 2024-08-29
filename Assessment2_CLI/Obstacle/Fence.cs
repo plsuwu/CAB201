@@ -1,6 +1,13 @@
 namespace a2cs;
 
 class Fence {
+    /// <summary>
+    /// Adder function for the <c>Fence</c> obstacle
+    /// <summary>
+    /// <param name="x">x-coordinate for this fence obstacle instance</param>
+    /// <param name="y">y-coordinate for this fence obstacle instance</param>
+    /// <param name="orientation">one of [east, north] to determine whether the fence extends vertically or horizontally</param>
+    /// <param name="len">length that the fence extends out from its initial cell</param>
     public static void Add(int x, int y, string orientation, int len) {
 
         // give the fence length and orientation by incrementing the x/y coordinate value

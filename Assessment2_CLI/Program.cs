@@ -1,10 +1,8 @@
 ﻿namespace a2cs;
 
-// i haven't made my way around to XML annotations + i have a little refactoring to do anyway;
-// so the file structure/program flow isnt set in STONE, but should indicate my general thought process
-// to some degree.
-//
-
+/// <summary>
+/// passes IO to and from the command handler
+/// </summary>
 class Program {
     private const string __WELCOME =
         "Welcome to the Threat-o-tron 9000 Obstacle Avoidance System.";
@@ -15,7 +13,7 @@ class Program {
         Console.WriteLine(Help.__HELP);
 
         var command = new Command();
-        command.InputLoop();
+        command.InputLoop(); // loop until SIGINT or 'exit' command is issued
 
         Console.WriteLine(__EXIT);
     }
